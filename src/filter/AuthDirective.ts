@@ -1,9 +1,5 @@
-import {
-    SchemaDirectiveVisitor
-} from "graphql-tools";
-import {
-    AuthenticationError, ApolloError
-} from 'apollo-server'
+import { SchemaDirectiveVisitor} from "graphql-tools";
+import { ApolloError } from 'apollo-server'
 import {
     GraphQLField,
     GraphQLSchema,

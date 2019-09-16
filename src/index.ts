@@ -1,8 +1,7 @@
 import "reflect-metadata";
 import { createConnection } from "typeorm";
-import { User } from "./entity/User";
-import { ApolloServer } from "apollo-server-express";
-import { typeDef } from "./schema";
+import { ApolloServer, gql } from "apollo-server-express";
+import { typeDefs } from "./schema";
 import { resolvers } from "./resolvers";
 import { JWTData } from "./entity/JWTData";
 import * as jwt from "jsonwebtoken"
@@ -10,7 +9,7 @@ import { AuthDirective } from "./filter/AuthDirective";
 import * as express from "express"
 
 const server = new ApolloServer({
-    typeDefs: typeDef,
+    typeDefs: typeDefs,
     resolvers: resolvers,
     context: async ({ req }) => {
         // console.log(req)

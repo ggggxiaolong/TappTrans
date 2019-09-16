@@ -1,4 +1,4 @@
-import { getRepository, createQueryBuilder, getConnection, EntityManager, MoreThan } from "typeorm";
+import { getRepository } from "typeorm";
 import * as jwt from "jsonwebtoken"
 import * as bcrypt from 'bcryptjs'
 import { User } from "./entity/User";
@@ -48,7 +48,7 @@ export const resolvers = {
         },
         projects: async(_,__,___, ____) => {
             return await getRepository(Project).find()
-        }
+        },
     },
     Mutation: {
         addLang: async(_, {lang}:{lang: AddLang},{user}:{user: User}, __) => {
@@ -62,6 +62,6 @@ export const resolvers = {
             const newLang = new Lang();
             lang.update(newLang, user.id);
             langRepo.save(newLang);
-        }
+        },
     }
 };

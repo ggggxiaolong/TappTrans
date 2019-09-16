@@ -1,6 +1,6 @@
 import {gql} from 'apollo-server';
 
-export const typeDef = gql`
+export const typeDefs = gql`
 directive @auth on OBJECT | FIELD_DEFINITION
 type User {
     id: ID!
@@ -88,15 +88,15 @@ input UpdateLang {
 }
 
 type Query {
-    login(mail: String!, password:String!): Token!
+    login(mail: String!, password: String!): Token!
     refreshToken(token: String): Token!
     language(page: Int, pageSize: Int, search: String): [Lang!] @auth
-    projects(): [Project] @auth
+    projects: [Project] @auth
 }
 
 type Mutation {
     register(user: AddUser): User @auth
     addLang(lang: AddLang): Lang @auth
-    updateLang(lang: UpdateLang): MixLang @auth
+    updateLang(lang: UpdateLang): Lang @auth
 }
 `;
