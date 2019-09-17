@@ -32,6 +32,7 @@ type Lang {
     descripe: String
     label: String
     file_name: String
+    mode_name: String
     project_id: Int
     status: Int!
     new_en: String!
@@ -45,6 +46,7 @@ type Lang {
     new_descripe: String
     new_label: String
     new_file_name: String
+    new_mode_name: String
     new_project_id: Int
     update_time: Int
     update_user_id: Int
@@ -69,6 +71,7 @@ input AddLang {
     label: String
     file_name: String
     project_id: Int!
+    mode_name: String
 }
 
 input UpdateLang {
@@ -85,6 +88,7 @@ input UpdateLang {
     label: String
     file_name: String
     project_id: Int
+    mode_name: String
 }
 
 type Query {

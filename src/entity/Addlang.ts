@@ -14,6 +14,7 @@ export class AddLang {
     label: string;
     file_name: string;
     project_id: number;
+    mode_name: string
     update(lang: Lang, user_id: number) {
         lang.en = Utils.checkStringNull(this.en);
         lang.ja = Utils.checkStringNull(this.ja);
@@ -28,6 +29,7 @@ export class AddLang {
         lang.file_name = Utils.checkStringNull(this.file_name);
         lang.project_id = this.project_id;
         lang.user_id = user_id;
+        lang.mode_name = this.mode_name;
         lang.create_time = new Date().getTime();
     }
 }
