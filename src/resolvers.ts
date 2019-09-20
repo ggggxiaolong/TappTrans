@@ -39,10 +39,12 @@ export const resolvers = {
                 return new AuthenticationError("refres token fail")
             }
         },
-        language: async(_,{search, pageSize = 20, page = 0 }:{search: string, pageSize: number, page: number}, __, ___) => {
+        language: async(_,{search, pageSize = 20, page = 0, projectId = 1 }:{search: string, pageSize: number, page: number, projectId: number}, __, ___) => {
             var queryBuilder = getRepository(Lang).createQueryBuilder("lang");
             if(search && 0 < search.length){
-                queryBuilder = queryBuilder.where("lang.en LIKE %:search%", {search:search})
+                queryBuilder = queryBuilder.where("lang.project_id = :projectId AND lang.en LIKE %:search%", {projectId:projectId, search:search})
+            } else {
+                queryBuilder = queryBuilder.where("lang.project_id = :projectId", {projectId:projectId})
             }
             return await queryBuilder.limit(pageSize).offset(page).getMany()
         },

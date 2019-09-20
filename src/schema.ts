@@ -94,7 +94,7 @@ input UpdateLang {
 type Query {
     login(mail: String!, password: String!): Token!
     refreshToken(token: String): Token!
-    language(page: Int, pageSize: Int, search: String): [Lang!] @auth
+    language(page: Int, pageSize: Int, search: String, projectId: Int): [Lang!] @auth
     projects: [Project] @auth
 }
 
