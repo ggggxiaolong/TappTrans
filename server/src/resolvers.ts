@@ -42,11 +42,11 @@ export const resolvers = {
         language: async(_,{search, pageSize = 20, page = 0, projectId = 1 }:{search: string, pageSize: number, page: number, projectId: number}, __, ___) => {
             var queryBuilder = getRepository(Lang).createQueryBuilder("lang");
             if(search && 0 < search.length){
-                queryBuilder = queryBuilder.where("lang.project_id = :projectId AND lang.en LIKE %:search%", {projectId:projectId, search:search})
+                queryBuilder = queryBuilder.where("lang.project_id = :projectId ", {projectId:projectId}).andWhere("lang.en LIKE :search",{search:"%"+search+"%"})
             } else {
                 queryBuilder = queryBuilder.where("lang.project_id = :projectId", {projectId:projectId})
             }
-            return await queryBuilder.limit(pageSize).offset(page).getMany()
+            return await queryBuilder.limit(pageSize).offset(page * pageSize).getMany()
         },
         projects: async(_,__,___, ____) => {
             return await getRepository(Project).find()
