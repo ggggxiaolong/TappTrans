@@ -35,7 +35,7 @@ type Lang {
     mode_name: String
     project_id: Int
     status: Int!
-    new_en: String!
+    new_en: String
     new_ja: String
     new_ko: String
     new_sk: String

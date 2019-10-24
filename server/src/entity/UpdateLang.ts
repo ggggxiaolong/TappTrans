@@ -15,21 +15,6 @@ export class UpdateLang {
     file_name: string;
     project_id: number;
     mode_name:string;
-    update(lang: Lang, user_id: number) {
-        lang.id = this.id;
-        lang.new_en = this.en;
-        lang.new_ja = this.ja;
-        lang.new_ko = this.ko;
-        lang.new_sk = this.sk;
-        lang.new_cs = this.cs;
-        lang.new_fr = this.fr;
-        lang.new_not_trans = this.not_trans;
-        lang.new_descripe = this.descripe;
-        lang.new_label = this.label;
-        lang.new_file_name = this.file_name;
-        lang.new_project_id = this.project_id;
-        lang.new_user_id = user_id;
-        lang.new_mode_name = this.mode_name
-        lang.update_time = new Date().getTime();
-    }
+    new_user_id: number;
+    update_time: number;
 }

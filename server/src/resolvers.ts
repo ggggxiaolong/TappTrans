@@ -42,7 +42,7 @@ export const resolvers = {
         language: async(_,{search, pageSize = 20, page = 0, projectId = 1 }:{search: string, pageSize: number, page: number, projectId: number}, __, ___) => {
             var queryBuilder = getRepository(Lang).createQueryBuilder("lang");
             if(search && 0 < search.length){
-                queryBuilder = queryBuilder.where("lang.project_id = :projectId ", {projectId:projectId}).andWhere("lang.en LIKE :search",{search:"%"+search+"%"})
+                queryBuilder = queryBuilder.where("lang.project_id = :projectId", {projectId:projectId, search:search}).andWhere("lang.en LIKE :search",{search:`%${search}%`})
             } else {
                 queryBuilder = queryBuilder.where("lang.project_id = :projectId", {projectId:projectId})
             }
@@ -61,9 +61,11 @@ export const resolvers = {
         },
         updateLang: async(_, {lang}:{lang: UpdateLang},{user}:{user: User}, __) => {
             const langRepo = getRepository(Lang);
-            const newLang = new Lang();
-            lang.update(newLang, user.id);
-            langRepo.save(newLang);
+            const newLang = await langRepo.findOne({where:{id: lang.id}});
+            if (!newLang) {return;}
+            newLang.copyFromUpdate(lang, user.id);
+            langRepo.update(lang.id, newLang);
+            return langRepo.findOne({where:{id: lang.id}});
         },
     }
 };

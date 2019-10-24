@@ -1,4 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { UpdateLang } from "./UpdateLang";
 
 @Entity()
 export class Lang {
@@ -98,5 +99,25 @@ export class Lang {
     create_time: number
 
     @Column({ nullable: true })
-    update_time: number
+    update_time: number;
+
+    copyFromUpdate(updateLong: UpdateLang, user_id: number) {
+        this.id = updateLong.id;
+        this.new_en = updateLong.en || null;
+        this.new_ja = updateLong.ja || null;
+        this.new_ko = updateLong.ko || null;
+        this.new_sk = updateLong.sk || null;
+        this.new_cs = updateLong.cs || null;
+        this.new_es = updateLong.es || null;
+        this.new_fr = updateLong.fr || null;
+        this.new_not_trans = updateLong.not_trans || null;
+        this.new_descripe = updateLong.descripe || null;
+        this.new_label = updateLong.label || null;
+        this.new_file_name = updateLong.file_name || null;
+        this.new_project_id = updateLong.project_id || null;
+        this.new_user_id = user_id;
+        this.new_mode_name = updateLong.mode_name || null;
+        this.update_time = new Date().getTime();
+        this.status = 2;
+    }
 }
