@@ -9,6 +9,8 @@ import { JWTData } from "./entity/JWTData";
 import { Project } from "./entity/Project";
 import { AddLang } from "./entity/Addlang";
 import { UpdateLang } from "./entity/UpdateLang";
+import { Trans } from "./entity/Trans";
+import { google } from "translation.js";
 
 export const resolvers = {
     Query: {
@@ -51,6 +53,11 @@ export const resolvers = {
         projects: async(_,__,___, ____) => {
             return await getRepository(Project).find()
         },
+        trans: async(_,{en}:{en:string},___,____) => {
+            let t = new Trans()
+            t.en = en
+            return t
+        }
     },
     Mutation: {
         addLang: async(_, {lang}:{lang: AddLang},{user}:{user: User}, __) => {
@@ -66,6 +73,56 @@ export const resolvers = {
             newLang.copyFromUpdate(lang, user.id);
             langRepo.update(lang.id, newLang);
             return langRepo.findOne({where:{id: lang.id}});
+        },
+    },
+    Trans:{
+        ja: async(trans: Trans,_,__,___) => {
+            if(trans.en){
+                let r = await google.translate({text:trans.en, from:"en", to:'ja'})
+                return r.result[0]
+            } else {
+                return ""
+            }
+        },
+        ko: async(trans: Trans,_,__,___) => {
+            if(trans.en){
+                let r = await google.translate({text:trans.en, from:"en", to:'ko'})
+                return r.result[0]
+            } else {
+                return ""
+            }
+        },
+        sk: async(trans: Trans,_,__,___) => {
+            if(trans.en){
+                let r = await google.translate({text:trans.en, from:"en", to:'sk'})
+                return r.result[0]
+            } else {
+                return ""
+            }
+        },
+        cs: async(trans: Trans,_,__,___) => {
+            if(trans.en){
+                let r = await google.translate({text:trans.en, from:"en", to:'cs'})
+                return r.result[0]
+            } else {
+                return ""
+            }
+        },
+        fr: async(trans: Trans,_,__,___) => {
+            if(trans.en){
+                let r = await google.translate({text:trans.en, from:"en", to:'fr'})
+                return r.result[0]
+            } else {
+                return ""
+            }
+        },
+        es: async(trans: Trans,_,__,___) => {
+            if(trans.en){
+                let r = await google.translate({text:trans.en, from:"en", to:'es'})
+                return r.result[0]
+            } else {
+                return ""
+            }
         },
     }
 };

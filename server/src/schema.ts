@@ -51,6 +51,15 @@ type Lang {
     update_time: Int
     update_user_id: Int
 }
+type Trans {
+    en: String
+    ja: String
+    ko: String
+    sk: String
+    cs: String
+    fr: String
+    es: String
+}
 
 input AddUser {
     username: String!
@@ -96,6 +105,7 @@ type Query {
     refreshToken(token: String): Token!
     language(page: Int, pageSize: Int, search: String, projectId: Int): [Lang!] @auth
     projects: [Project] @auth
+    trans(en: String): Trans!
 }
 
 type Mutation {
