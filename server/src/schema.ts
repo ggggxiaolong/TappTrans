@@ -105,7 +105,7 @@ type Query {
     refreshToken(token: String): Token!
     language(page: Int, pageSize: Int, search: String, projectId: Int): [Lang!] @auth
     projects: [Project] @auth
-    trans(en: String): Trans!
+    trans(en: String): Trans! @auth
 }
 
 type Mutation {

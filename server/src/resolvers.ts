@@ -63,8 +63,9 @@ export const resolvers = {
         addLang: async(_, {lang}:{lang: AddLang},{user}:{user: User}, __) => {
             const langRepo = getRepository(Lang);
             const newLang = new Lang();
-            lang.update(newLang, user.id);
-            langRepo.insert(newLang);
+            newLang.copyFromInsert(lang, user.id);
+            let l = await langRepo.insert(newLang);
+            return await langRepo.findOne({where:{id: l.raw}});;
         },
         updateLang: async(_, {lang}:{lang: UpdateLang},{user}:{user: User}, __) => {
             const langRepo = getRepository(Lang);
@@ -72,7 +73,7 @@ export const resolvers = {
             if (!newLang) {return;}
             newLang.copyFromUpdate(lang, user.id);
             langRepo.update(lang.id, newLang);
-            return langRepo.findOne({where:{id: lang.id}});
+            return await langRepo.findOne({where:{id: lang.id}});
         },
     },
     Trans:{

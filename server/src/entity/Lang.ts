@@ -1,5 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 import { UpdateLang } from "./UpdateLang";
+import { Utils } from "../Utils";
+import { AddLang } from "./Addlang";
 
 @Entity()
 export class Lang {
@@ -118,6 +120,24 @@ export class Lang {
         this.new_user_id = user_id;
         this.new_mode_name = updateLong.mode_name || null;
         this.update_time = new Date().getTime();
+        this.status = 1;
+    }
+    copyFromInsert(lang: AddLang, user_id: number) {
+        this.en = Utils.checkStringNull(lang.en);
+        this.ja = Utils.checkStringNull(lang.ja);
+        this.ko = Utils.checkStringNull(lang.ko);
+        this.sk = Utils.checkStringNull(lang.sk);
+        this.cs = Utils.checkStringNull(lang.cs);
+        this.fr = Utils.checkStringNull(lang.fr);
+        this.es = Utils.checkStringNull(lang.es);
+        this.not_trans = lang.not_trans;
+        this.descripe = Utils.checkStringNull(lang.descripe);
+        this.label = Utils.checkStringNull(lang.label);
+        this.file_name = Utils.checkStringNull(lang.file_name);
+        this.project_id = lang.project_id;
+        this.user_id = user_id;
+        this.mode_name = lang.mode_name;
+        this.create_time = new Date().getTime();
         this.status = 2;
     }
 }
