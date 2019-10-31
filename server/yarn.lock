@@ -74,6 +74,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/blueimp-md5@^2.7.0":
+  version "2.7.0"
+  resolved "https://registry.npm.taobao.org/@types/blueimp-md5/download/@types/blueimp-md5-2.7.0.tgz#404222806800478ca2782e8ad46590aba7f14627"
+  integrity sha1-QEIigGgAR4yieC6K1GWQq6fxRic=
+
 "@types/body-parser@*", "@types/body-parser@1.17.1":
   version "1.17.1"
   resolved "https://registry.npm.taobao.org/@types/body-parser/download/@types/body-parser-1.17.1.tgz#18fcf61768fb5c30ccc508c21d6fd2e8b3bf7897"
@@ -202,6 +207,11 @@
   version "10.14.18"
   resolved "https://registry.npm.taobao.org/@types/node/download/@types/node-10.14.18.tgz?cache=0&sync_timestamp=1568180598397&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fnode%2Fdownload%2F%40types%2Fnode-10.14.18.tgz#b7d45fc950e6ffd7edc685e890d13aa7b8535dce"
   integrity sha1-t9RfyVDm/9ftxoXokNE6p7hTXc4=
+
+"@types/node@^12.7.12":
+  version "12.12.3"
+  resolved "https://registry.npm.taobao.org/@types/node/download/@types/node-12.12.3.tgz#ebfe83507ac506bc3486314a8aa395be66af8d23"
+  integrity sha1-6/6DUHrFBrw0hjFKiqOVvmavjSM=
 
 "@types/range-parser@*":
   version "1.2.3"
@@ -630,6 +640,11 @@ binary-extensions@^1.0.0:
   version "1.13.1"
   resolved "https://registry.npm.taobao.org/binary-extensions/download/binary-extensions-1.13.1.tgz#598afe54755b2868a5330d2aff9d4ebb53209b65"
   integrity sha1-WYr+VHVbKGilMw0q/51Ou1Mgm2U=
+
+blueimp-md5@^2.10.0:
+  version "2.12.0"
+  resolved "https://registry.npm.taobao.org/blueimp-md5/download/blueimp-md5-2.12.0.tgz#be7367938a889dec3ffbb71138617c117e9c130a"
+  integrity sha1-vnNnk4qInew/+7cROGF8EX6cEwo=
 
 body-parser@1.19.0, body-parser@^1.18.3:
   version "1.19.0"
@@ -3245,6 +3260,16 @@ tough-cookie@~2.4.3:
   dependencies:
     psl "^1.1.24"
     punycode "^1.4.1"
+
+translation.js@^0.7.12:
+  version "0.7.12"
+  resolved "https://registry.npm.taobao.org/translation.js/download/translation.js-0.7.12.tgz#5ac61e964fcb787c750c7d4fcad798fd5090d05e"
+  integrity sha1-WsYelk/LeHx1DH1PyteY/VCQ0F4=
+  dependencies:
+    "@types/blueimp-md5" "^2.7.0"
+    "@types/node" "^12.7.12"
+    blueimp-md5 "^2.10.0"
+    tslib "^1.9.3"
 
 ts-invariant@^0.4.0:
   version "0.4.4"
