@@ -12,6 +12,15 @@ import { UpdateLang } from "./entity/UpdateLang";
 import { Trans } from "./entity/Trans";
 import { google } from "translation.js";
 
+function beforeTrans(source: string): string {
+    return source.replace("&#096;","'")
+}
+
+function afterTrans(source: string): string {
+    return source.replace("'","&#096;").replace(/% (\d) \$ (s|d)/g,' %$1$$$2 ').replace(/\s+/g," ").replace(/^ /, "")
+}
+
+
 export const resolvers = {
     Query: {
         login: async (_, { mail, password }, __, ___) => {
@@ -19,108 +28,114 @@ export const resolvers = {
             const user: User = await userRepository.findOne({ where: { mail: mail } })
             if (user && bcrypt.compareSync(password, user.password)) {
                 user.password = ''
-                const refreshToken = jwt.sign({user: user, isRefresh: true}, 'secret',{ expiresIn: 60 * 60 * 24 * 7})
-                const accessToken = jwt.sign({user: user, isRefresh: false}, 'secret',{ expiresIn: 60 * 60})
+                const refreshToken = jwt.sign({ user: user, isRefresh: true }, 'secret', { expiresIn: 60 * 60 * 24 * 7 })
+                const accessToken = jwt.sign({ user: user, isRefresh: false }, 'secret', { expiresIn: 60 * 60 })
                 const token = new Token(accessToken, refreshToken)
                 return token
             } else {
                 throw new AuthenticationError("error username or password")
             }
         },
-        refreshToken: async(_,{token}, __, ___) => {
-            try{
-                const data = <JWTData>jwt.verify(token, "secret",{ignoreExpiration: true})
-                if(data.isRefresh){
-                    const refreshToken = jwt.sign({user: data.user, isRefresh: true}, 'secret',{ expiresIn: 60 * 60 * 24 * 7})
-                    const accessToken = jwt.sign({user: data.user, isRefresh: false}, 'secret',{ expiresIn: 60 * 60})
+        refreshToken: async (_, { token }, __, ___) => {
+            try {
+                const data = <JWTData>jwt.verify(token, "secret", { ignoreExpiration: true })
+                if (data.isRefresh) {
+                    const refreshToken = jwt.sign({ user: data.user, isRefresh: true }, 'secret', { expiresIn: 60 * 60 * 24 * 7 })
+                    const accessToken = jwt.sign({ user: data.user, isRefresh: false }, 'secret', { expiresIn: 60 * 60 })
                     return new Token(accessToken, refreshToken)
                 } else {
                     throw new AuthenticationError("error refres token")
                 }
-            } catch(e){
+            } catch (e) {
                 return new AuthenticationError("refres token fail")
             }
         },
-        language: async(_,{search, pageSize = 20, page = 0, projectId = 1 }:{search: string, pageSize: number, page: number, projectId: number}, __, ___) => {
+        language: async (_, { search, pageSize = 20, page = 0, projectId = 1, type = "all" }: { search: string, pageSize: number, page: number, projectId: number, type: string }, __, ___) => {
             var queryBuilder = getRepository(Lang).createQueryBuilder("lang");
-            if(search && 0 < search.length){
-                queryBuilder = queryBuilder.where("lang.project_id = :projectId", {projectId:projectId, search:search}).andWhere("lang.en LIKE :search",{search:`%${search}%`})
+            if (search && 0 < search.length) {
+                queryBuilder = queryBuilder.where("lang.project_id = :projectId", { projectId: projectId, search: search }).andWhere("lang.en LIKE :search", { search: `%${search}%` })
             } else {
-                queryBuilder = queryBuilder.where("lang.project_id = :projectId", {projectId:projectId})
+                queryBuilder = queryBuilder.where("lang.project_id = :projectId", { projectId: projectId })
             }
+            queryBuilder.orderBy({ "lang.update_time": "DESC" })
             return await queryBuilder.limit(pageSize).offset(page * pageSize).getMany()
         },
-        projects: async(_,__,___, ____) => {
+        projects: async (_, __, ___, ____) => {
             return await getRepository(Project).find()
         },
-        trans: async(_,{en}:{en:string},___,____) => {
+        trans: async (_, { en }: { en: string }, ___, ____) => {
             let t = new Trans()
             t.en = en
             return t
         }
     },
     Mutation: {
-        addLang: async(_, {lang}:{lang: AddLang},{user}:{user: User}, __) => {
+        addLang: async (_, { lang }: { lang: AddLang }, { user }: { user: User }, __) => {
             const langRepo = getRepository(Lang);
             const newLang = new Lang();
             newLang.copyFromInsert(lang, user.id);
             let l = await langRepo.insert(newLang);
-            return await langRepo.findOne({where:{id: l.raw}});;
+            return await langRepo.findOne({ where: { id: l.raw } });;
         },
-        updateLang: async(_, {lang}:{lang: UpdateLang},{user}:{user: User}, __) => {
+        updateLang: async (_, { lang }: { lang: UpdateLang }, { user }: { user: User }, __) => {
             const langRepo = getRepository(Lang);
-            const newLang = await langRepo.findOne({where:{id: lang.id}});
-            if (!newLang) {return;}
+            const newLang = await langRepo.findOne({ where: { id: lang.id } });
+            if (!newLang) { return; }
             newLang.copyFromUpdate(lang, user.id);
             langRepo.update(lang.id, newLang);
-            return await langRepo.findOne({where:{id: lang.id}});
+            return await langRepo.findOne({ where: { id: lang.id } });
         },
     },
-    Trans:{
-        ja: async(trans: Trans,_,__,___) => {
-            if(trans.en){
-                let r = await google.translate({text:trans.en, from:"en", to:'ja'})
+    Trans: {
+        ja: async (trans: Trans, _, __, ___) => {
+            if (trans.en) {
+                let r = await google.translate({ text: trans.en, from: "en", to: 'ja' })
                 return r.result[0]
             } else {
                 return ""
             }
         },
-        ko: async(trans: Trans,_,__,___) => {
-            if(trans.en){
-                let r = await google.translate({text:trans.en, from:"en", to:'ko'})
-                return r.result[0]
+        ko: async (trans: Trans, _, __, ___) => {
+            if (trans.en) {
+                let text = beforeTrans(trans.en)
+                let r = await google.translate({ text: text, from: "en", to: 'ko' })
+                return afterTrans(r.result[0])
             } else {
                 return ""
             }
         },
-        sk: async(trans: Trans,_,__,___) => {
-            if(trans.en){
-                let r = await google.translate({text:trans.en, from:"en", to:'sk'})
-                return r.result[0]
+        sk: async (trans: Trans, _, __, ___) => {
+            if (trans.en) {
+                let text = beforeTrans(trans.en)
+                let r = await google.translate({ text: text, from: "en", to: 'sk' })
+                return afterTrans(r.result[0])
             } else {
                 return ""
             }
         },
-        cs: async(trans: Trans,_,__,___) => {
-            if(trans.en){
-                let r = await google.translate({text:trans.en, from:"en", to:'cs'})
-                return r.result[0]
+        cs: async (trans: Trans, _, __, ___) => {
+            if (trans.en) {
+                let text = beforeTrans(trans.en)
+                let r = await google.translate({ text: text, from: "en", to: 'cs' })
+                return afterTrans(r.result[0])
             } else {
                 return ""
             }
         },
-        fr: async(trans: Trans,_,__,___) => {
-            if(trans.en){
-                let r = await google.translate({text:trans.en, from:"en", to:'fr'})
-                return r.result[0]
+        fr: async (trans: Trans, _, __, ___) => {
+            if (trans.en) {
+                let text = beforeTrans(trans.en)
+                let r = await google.translate({ text: text, from: "en", to: 'fr' })
+                return afterTrans(r.result[0])
             } else {
                 return ""
             }
         },
-        es: async(trans: Trans,_,__,___) => {
-            if(trans.en){
-                let r = await google.translate({text:trans.en, from:"en", to:'es'})
-                return r.result[0]
+        es: async (trans: Trans, _, __, ___) => {
+            if (trans.en) {
+                let text = beforeTrans(trans.en)
+                let r = await google.translate({ text: text, from: "en", to: 'es' })
+                return afterTrans(r.result[0])
             } else {
                 return ""
             }

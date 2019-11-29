@@ -48,8 +48,8 @@ type Lang {
     new_file_name: String
     new_mode_name: String
     new_project_id: Int
-    update_time: Int
-    update_user_id: Int
+    update_time: Float
+    update_user_id: Float
 }
 type Trans {
     en: String
@@ -103,7 +103,7 @@ input UpdateLang {
 type Query {
     login(mail: String!, password: String!): Token!
     refreshToken(token: String): Token!
-    language(page: Int, pageSize: Int, search: String, projectId: Int): [Lang!] @auth
+    language(page: Int, pageSize: Int, search: String, projectId: Int, type: String): [Lang!] @auth
     projects: [Project] @auth
     trans(en: String): Trans! @auth
 }

@@ -138,6 +138,7 @@ export class Lang {
         this.user_id = user_id;
         this.mode_name = lang.mode_name;
         this.create_time = new Date().getTime();
+        this.update_time = new Date().getTime();
         this.status = 2;
     }
 }
