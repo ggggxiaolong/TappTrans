@@ -1,0 +1,33 @@
+export interface Lang {
+    id: number;
+    user_id: number;
+    en: string;
+    ja: string;
+    ko: string;
+    sk: string;
+    cs: string;
+    fr: string;
+    es: string;
+    not_trans: number;
+    descripe: string;
+    label: string;
+    file_name: string;
+    mode_name: string;
+    project_id: number;
+    status: number;
+    new_en: string;
+    new_ja: string;
+    new_ko: string;
+    new_sk: string;
+    new_cs: string;
+    new_fr: string;
+    new_es: string;
+    new_not_trans: number;
+    new_descripe: string;
+    new_label: string;
+    new_file_name: string;
+    new_mode_name: string;
+    new_project_id: number;
+    update_time: number;
+    update_user_id: number;
+  }

@@ -1,10 +1,7 @@
 import React, { useState, ReactNode } from "react";
 import ApolloClient, { PresetConfig, gql } from "apollo-boost";
 import { ApolloProvider } from "@apollo/react-hooks";
-
-const defaultConfig: PresetConfig = {
-  uri: process.env.REACT_APP_HOST
-};
+import { useCookies } from 'react-cookie';
 
 type RefreshToken = {
   refresh?(): Promise<boolean>;
@@ -13,10 +10,16 @@ type RefreshToken = {
 export const TokenContext = React.createContext<RefreshToken>({});
 
 export default function ClinetProvider({ children }: { children?: ReactNode }) {
-  const [config, setConfig] = useState(defaultConfig);
-  const client = new ApolloClient(config);
+  const [cookie, setCookie] = useCookies(['token']);
+  const defaultConfig: PresetConfig = {
+    uri: process.env.REACT_APP_HOST,
+    headers:{token:cookie.token}
+  };
+  // const [config, setConfig] = useState(defaultConfig);
+  console.log(cookie);
+  const client = new ApolloClient(defaultConfig);
   async function freshToken(): Promise<boolean> {
-    return new ApolloClient(defaultConfig)
+    return client
       .query({ query: gql`` })
       .catch(e => false)
       .then(r => true);

@@ -14,9 +14,10 @@
     "apollo-boost": "^0.4.4",
     "graphql": "^14.5.8",
     "react": "^16.9.0",
+    "react-cookie": "^4.0.1",
     "react-dom": "^16.9.0",
     "react-router-dom": "^5.1.2",
-    "react-scripts": "3.1.2"
+    "react-scripts": "3.2.0"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -40,6 +41,6 @@
     ]
   },
   "devDependencies": {
-    "typescript": "^3.7.2"
+    "@babel/plugin-proposal-nullish-coalescing-operator": "^7.7.4"
   }
 }
