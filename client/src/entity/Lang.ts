@@ -1,5 +1,5 @@
 export interface Lang {
-    id: number;
+    id: string;
     user_id: number;
     en: string;
     ja: string;

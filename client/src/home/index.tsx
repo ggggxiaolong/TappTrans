@@ -2,6 +2,7 @@ import React from "react";
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Table from "@material-ui/core/Table";
+import Button from "@material-ui/core/Button";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
@@ -21,14 +22,16 @@ import Search from "@material-ui/icons/Search";
 import { useQuery } from "@apollo/react-hooks";
 import { gql } from "apollo-boost";
 import { Languages } from "../entity/Languages";
+import { Lang } from "../entity/Lang";
+import LinearProgress from "@material-ui/core/LinearProgress";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      width: "100%",
+      width: "100%"
     },
     tableWrapper: {
-      overflow: "auto",
+      overflow: "auto"
     },
     formControl: {
       margin: theme.spacing(1),
@@ -55,6 +58,16 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     textField: {
       width: 200
+    },
+    progress: {
+      width: "100%",
+      textAlign: "center",
+      "& > * + *": {
+        marginTop: theme.spacing(2)
+      },
+      "& > *": {
+        margin: theme.spacing(1)
+      }
     }
   })
 );
@@ -64,6 +77,7 @@ interface SearchParam {
   languages: Array<Language>;
   search: string;
   page: number;
+  pageSize: number;
 }
 
 type Language = "en" | "ja" | "ko" | "sk" | "cs" | "fr" | "es";
@@ -74,7 +88,8 @@ const defaultSearchParam: SearchParam = {
   projectId: 2,
   languages: allLanguage.slice(),
   search: "",
-  page: 0
+  page: 1,
+  pageSize: 20
 };
 
 const languagesMap: Map<string, string> = new Map([
@@ -88,22 +103,39 @@ const languagesMap: Map<string, string> = new Map([
 ]);
 
 const LANGQUERY = (param: SearchParam) => gql`
-  query language($page: Int, $search: String , $projectId: Int) {
-    language(page: $page, search: $search, projectId: $projectId) {
-      ${param.languages.join(" ")}
+  query language($page: Int, $search: String , $projectId: Int, $pageSize: Int) {
+    language(page: $page, search: $search, projectId: $projectId, pageSize: $pageSize) {
+      id ${param.languages.join(" ")}
     }
   }
 `;
 
 export default function Home() {
   const classes = useStyles();
+  const [data, setData] = React.useState<Array<Lang>>([]);
+  const [hasMore, setHasMore] = React.useState(true);
   const [param, setParam] = React.useState(defaultSearchParam);
-  const { loading, error, data } = useQuery<Languages>(LANGQUERY(param), {
-    variables: { ...param }
+  const { loading, error } = useQuery<Languages>(LANGQUERY(param), {
+    variables: { ...param },
+    onCompleted: result => {
+      if (param.page === 1) {
+        setData(result.language);
+      } else {
+        data.push(...result.language);
+        setData(data);
+      }
+      setHasMore(result.language.length >= param.pageSize);
+    }
   });
 
   const handleProject = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setParam({ ...param, projectId: event.target.value as number });
+    setParam({ ...param, projectId: event.target.value as number, page: 1 });
+  };
+
+  const nextPage = () => {
+    if (!loading) {
+      setParam({ ...param, page: param.page + 1 });
+    }
   };
 
   const handleLanguage = (name: Language) => (
@@ -116,22 +148,23 @@ export default function Home() {
     }
     setParam({
       ...param,
+      page: 1,
       languages: param.languages
     });
   };
 
   const handleClearSearch = () => {
     if (param.search != null || param.search !== "") {
-      setParam({ ...param, search: "" });
+      setParam({ ...param, search: "", page: 1 });
     }
   };
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setParam({ ...param, search: event.target.value.trim() });
+    setParam({ ...param, search: event.target.value.trim(), page: 1 });
   };
 
   return (
-    <Paper className={classes.root}>
+    <Paper className={classes.root} key="home_root">
       <FormGroup row>
         <FormControl className={classes.formControl}>
           <InputLabel id="demo-simple-select-label">Project</InputLabel>
@@ -181,34 +214,47 @@ export default function Home() {
           />
         </FormControl>
       </FormGroup>
-      <div className={classes.tableWrapper}>
-        <Table stickyHeader aria-label="sticky table">
-          <TableHead>
+      <div className={classes.tableWrapper} key="table_root">
+        <Table stickyHeader aria-label="sticky table" key="table">
+          <TableHead key="table_head">
             <TableRow>
               {param.languages.map(lang => (
-                <TableCell key={"head_"+lang} align="inherit" style={{ minWidth: 170 }}>
+                <TableCell
+                  key={`head_${lang}`}
+                  align="inherit"
+                  style={{ minWidth: 170 }}
+                >
                   {languagesMap.get(lang)}
                 </TableCell>
               ))}
             </TableRow>
           </TableHead>
-          <TableBody>
-            {data &&
-              data.language.map(row => {
-                const rowKey = String(row.id);
-                return (
-                  <TableRow hover role="checkbox" tabIndex={-1} key={rowKey}>
-                    {param.languages.map(column => {
-                      const value = row[column];
-                      return (
-                        <TableCell key={rowKey + column}>{value}</TableCell>
-                      );
-                    })}
-                  </TableRow>
-                );
-              })}
+          <TableBody key="table_body">
+            {console.log(data)}
+            {data.map(row => {
+              const rowKey = row.id;
+              return (
+                <TableRow hover role="checkbox" tabIndex={-1} key={rowKey}>
+                  {param.languages.map(column => {
+                    const value = row[column];
+                    return <TableCell key={`${rowKey}_${column}`}>{value}</TableCell>;
+                  })}
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
+      </div>
+      <div className={classes.progress}>
+        {loading ? (
+          <LinearProgress />
+        ) : hasMore ? (
+          <Button variant="contained" color="primary" onClick={nextPage}>
+            Load more
+          </Button>
+        ) : (
+          <hr />
+        )}
       </div>
     </Paper>
   );
