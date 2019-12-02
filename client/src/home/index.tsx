@@ -25,10 +25,10 @@ import { Languages } from "../entity/Languages";
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      width: "100%"
+      width: "100%",
     },
     tableWrapper: {
-      overflow: "auto"
+      overflow: "auto",
     },
     formControl: {
       margin: theme.spacing(1),
@@ -121,7 +121,7 @@ export default function Home() {
   };
 
   const handleClearSearch = () => {
-    if (param.search != null || param.search != "") {
+    if (param.search != null || param.search !== "") {
       setParam({ ...param, search: "" });
     }
   };

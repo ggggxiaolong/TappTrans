@@ -1,5 +1,5 @@
-import React, { useState, ReactNode } from "react";
-import ApolloClient, { PresetConfig, gql } from "apollo-boost";
+import React, { ReactNode } from "react";
+import ApolloClient, { PresetConfig, gql, InMemoryCache } from "apollo-boost";
 import { ApolloProvider } from "@apollo/react-hooks";
 import { useCookies } from 'react-cookie';
 
@@ -13,7 +13,8 @@ export default function ClinetProvider({ children }: { children?: ReactNode }) {
   const [cookie, setCookie] = useCookies(['token']);
   const defaultConfig: PresetConfig = {
     uri: process.env.REACT_APP_HOST,
-    headers:{token:cookie.token}
+    headers:{token:cookie.token},
+    cache: new InMemoryCache()
   };
   // const [config, setConfig] = useState(defaultConfig);
   console.log(cookie);
