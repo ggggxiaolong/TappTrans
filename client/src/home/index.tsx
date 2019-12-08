@@ -20,10 +20,13 @@ import InputAdornment from "@material-ui/core/InputAdornment";
 import Clear from "@material-ui/icons/Clear";
 import Search from "@material-ui/icons/Search";
 import { useQuery } from "@apollo/react-hooks";
-import { gql } from "apollo-boost";
+import { gql, ApolloError } from "apollo-boost";
 import { Languages } from "../entity/Languages";
 import { Lang } from "../entity/Lang";
 import LinearProgress from "@material-ui/core/LinearProgress";
+import Status from "./status";
+import Fab from '@material-ui/core/Fab';
+import AddIcon from '@material-ui/icons/Add';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -68,7 +71,12 @@ const useStyles = makeStyles((theme: Theme) =>
       "& > *": {
         margin: theme.spacing(1)
       }
-    }
+    },
+    fab: {
+      position: 'fixed',
+      bottom: theme.spacing(2),
+      right: theme.spacing(2),
+    },
   })
 );
 
@@ -80,19 +88,36 @@ interface SearchParam {
   pageSize: number;
 }
 
+interface Result {
+  param: SearchParam;
+  data: Array<Lang>;
+  hasMore: boolean;
+  error: ApolloError | null;
+}
+
 type Language = "en" | "ja" | "ko" | "sk" | "cs" | "fr" | "es";
 type ProjectId = number;
 const allLanguage: Array<Language> = ["en", "ja", "ko", "sk", "cs", "fr", "es"];
+
+const firstPageNum = 0;
 
 const defaultSearchParam: SearchParam = {
   projectId: 2,
   languages: allLanguage.slice(),
   search: "",
-  page: 1,
+  page: firstPageNum,
   pageSize: 20
 };
 
+const defaultResult: Result = {
+  param: defaultSearchParam,
+  data: [],
+  hasMore: false,
+  error: null,
+};
+
 const languagesMap: Map<string, string> = new Map([
+  ["status", "Status"],
   ["en", "English"],
   ["ja", "Japanese"],
   ["ko", "Korean"],
@@ -105,36 +130,48 @@ const languagesMap: Map<string, string> = new Map([
 const LANGQUERY = (param: SearchParam) => gql`
   query language($page: Int, $search: String , $projectId: Int, $pageSize: Int) {
     language(page: $page, search: $search, projectId: $projectId, pageSize: $pageSize) {
-      id ${param.languages.join(" ")}
+      id ${param.languages.join(" ")} status
     }
   }
 `;
 
 export default function Home() {
   const classes = useStyles();
-  const [data, setData] = React.useState<Array<Lang>>([]);
-  const [hasMore, setHasMore] = React.useState(true);
+  const [result, setResult] = React.useState<Result>(defaultResult);
+  const [loading, setLoading] = React.useState(false);
   const [param, setParam] = React.useState(defaultSearchParam);
-  const { loading, error } = useQuery<Languages>(LANGQUERY(param), {
+
+  useQuery<Languages>(LANGQUERY(param), {
     variables: { ...param },
-    onCompleted: result => {
-      if (param.page === 1) {
-        setData(result.language);
+    onCompleted: data => {
+      const hasMore = data.language.length >= param.pageSize;
+      if (param.page === firstPageNum) {
+        setResult({ param: param, data: data.language, hasMore: hasMore, error: null });
       } else {
-        data.push(...result.language);
-        setData(data);
+        result.data.push(...data.language);
+        setResult({ param: param, data: result.data, hasMore: hasMore, error: null });
       }
-      setHasMore(result.language.length >= param.pageSize);
+      setParam(param)
+      setLoading(false)
+    },
+    onError: error => {
+      const lastParam = result.param
+      lastParam.page = lastParam.page === firstPageNum ? firstPageNum : lastParam.page - 1;
+      setResult({ ...result, error: error, param: { ...lastParam } })
+      setParam(lastParam)
+      setLoading(false)
     }
   });
 
   const handleProject = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setParam({ ...param, projectId: event.target.value as number, page: 1 });
+    const newParam = { ...param, projectId: event.target.value as number, page: firstPageNum }
+    feachData(newParam);
   };
 
   const nextPage = () => {
     if (!loading) {
-      setParam({ ...param, page: param.page + 1 });
+      const newParam = { ...param, page: param.page + 1 }
+      feachData(newParam);
     }
   };
 
@@ -146,21 +183,29 @@ export default function Home() {
     } else {
       param.languages.splice(allLanguage.indexOf(name), 0, name);
     }
-    setParam({
+    const newParam = {
       ...param,
-      page: 1,
+      page: firstPageNum,
       languages: param.languages
-    });
+    }
+    feachData(newParam);
   };
 
   const handleClearSearch = () => {
     if (param.search != null || param.search !== "") {
-      setParam({ ...param, search: "", page: 1 });
+      const newParam = { ...param, search: "", page: firstPageNum }
+      feachData(newParam);
     }
   };
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setParam({ ...param, search: event.target.value.trim(), page: 1 });
+    const newParam = { ...param, search: event.target.value.trim(), page: firstPageNum }
+    feachData(newParam);
+  };
+
+  const feachData = (param: SearchParam) => {
+    setParam(param);
+    setLoading(true);
   };
 
   return (
@@ -214,10 +259,20 @@ export default function Home() {
           />
         </FormControl>
       </FormGroup>
+      <Fab color="primary" aria-label="add" className={classes.fab}>
+        <AddIcon />
+      </Fab>
       <div className={classes.tableWrapper} key="table_root">
         <Table stickyHeader aria-label="sticky table" key="table">
           <TableHead key="table_head">
             <TableRow>
+              <TableCell
+                key={`head_status`}
+                align="inherit"
+                style={{ minWidth: 50 }}
+              >
+                Status
+                </TableCell>
               {param.languages.map(lang => (
                 <TableCell
                   key={`head_${lang}`}
@@ -229,16 +284,21 @@ export default function Home() {
               ))}
             </TableRow>
           </TableHead>
-          <TableBody key="table_body">
-            {console.log(data)}
-            {data.map(row => {
-              const rowKey = row.id;
+          <TableBody>
+            {result.data.map(row => {
+              const rowKey = `${param.projectId}_${row.id}`;
+              console.log(rowKey)
               return (
                 <TableRow hover role="checkbox" tabIndex={-1} key={rowKey}>
-                  {param.languages.map(column => {
-                    const value = row[column];
-                    return <TableCell key={`${rowKey}_${column}`}>{value}</TableCell>;
-                  })}
+                  <TableCell key={`${rowKey}_status`}>
+                    <Status status={row['status'] as number}/>
+                  </TableCell>
+                  {
+                    param.languages.map(column => {
+                      const value = row[column];
+                      return <TableCell key={`${rowKey}_${column}`}>{value}</TableCell>;
+                    })
+                  }
                 </TableRow>
               );
             })}
@@ -248,13 +308,13 @@ export default function Home() {
       <div className={classes.progress}>
         {loading ? (
           <LinearProgress />
-        ) : hasMore ? (
+        ) : result.hasMore ? (
           <Button variant="contained" color="primary" onClick={nextPage}>
             Load more
           </Button>
         ) : (
-          <hr />
-        )}
+              <hr />
+            )}
       </div>
     </Paper>
   );

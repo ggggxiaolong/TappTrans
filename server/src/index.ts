@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import { createConnection } from "typeorm";
-import { ApolloServer, gql } from "apollo-server-express";
+import { ApolloServer } from "apollo-server-express";
 import { typeDefs } from "./schema";
 import { resolvers } from "./resolvers";
 import { JWTData } from "./entity/JWTData";
