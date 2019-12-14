@@ -16,7 +16,7 @@ export class AuthDirective extends SchemaDirectiveVisitor {
             if (context.user) {
                 return next(result, args, context, info)
             } else {
-                throw new ApolloError("you must login", "TOKEN_EXPIRE")
+                throw new ApolloError("CODE_TOKEN_EXPIRE", "TOKEN_EXPIRE")
             }
         }
     }
@@ -31,7 +31,7 @@ export class AuthDirective extends SchemaDirectiveVisitor {
                 if (context.user) {
                     return next(result, args, context, info)
                 } else {
-                    throw new ApolloError("you must login", "TOKEN_EXPIRE")
+                    throw new ApolloError("CODE_TOKEN_EXPIRE", "TOKEN_EXPIRE")
                 }
             };
           });

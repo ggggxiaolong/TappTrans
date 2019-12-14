@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Table from "@material-ui/core/Table";
@@ -27,6 +27,9 @@ import LinearProgress from "@material-ui/core/LinearProgress";
 import Status from "./status";
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
+import { green } from '@material-ui/core/colors';
+import { TokenContext } from "../config/clinetProvicer";
+import { Redirect } from "react-router-dom";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -77,6 +80,9 @@ const useStyles = makeStyles((theme: Theme) =>
       bottom: theme.spacing(2),
       right: theme.spacing(2),
     },
+    updateWord:{
+      color: green[500]
+    }
   })
 );
 
@@ -140,6 +146,8 @@ export default function Home() {
   const [result, setResult] = React.useState<Result>(defaultResult);
   const [loading, setLoading] = React.useState(false);
   const [param, setParam] = React.useState(defaultSearchParam);
+  const refreshToken = useContext(TokenContext)
+  const [redirect, setRedirect] = React.useState(false);
 
   useQuery<Languages>(LANGQUERY(param), {
     variables: { ...param },
@@ -155,11 +163,22 @@ export default function Home() {
       setLoading(false)
     },
     onError: error => {
-      const lastParam = result.param
-      lastParam.page = lastParam.page === firstPageNum ? firstPageNum : lastParam.page - 1;
-      setResult({ ...result, error: error, param: { ...lastParam } })
-      setParam(lastParam)
-      setLoading(false)
+      const message = error.graphQLErrors[0].message
+      if(message === "CODE_TOKEN_EXPIRE"){
+        refreshToken.refresh().then(r => {
+          if(r){
+            const lastParam = result.param
+            lastParam.page = lastParam.page === firstPageNum ? firstPageNum : lastParam.page - 1;
+            setResult({ ...result, error: error, param: { ...lastParam } })
+            setParam(lastParam)
+            setLoading(false)
+          } else {
+            setRedirect(true)
+          }
+        }).catch(e => {
+          setRedirect(true)
+        })
+      }
     }
   });
 
@@ -208,6 +227,7 @@ export default function Home() {
     setLoading(true);
   };
 
+  if (redirect) return <Redirect to="/"/>
   return (
     <Paper className={classes.root} key="home_root">
       <FormGroup row>
@@ -287,7 +307,6 @@ export default function Home() {
           <TableBody>
             {result.data.map(row => {
               const rowKey = `${param.projectId}_${row.id}`;
-              console.log(rowKey)
               return (
                 <TableRow hover role="checkbox" tabIndex={-1} key={rowKey}>
                   <TableCell key={`${rowKey}_status`}>

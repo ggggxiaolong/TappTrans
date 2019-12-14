@@ -1,4 +1,4 @@
-import React, { useState, FormEvent } from "react";
+import React, { useState, FormEvent, useEffect, useContext } from "react";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -20,6 +20,7 @@ import { useCookies } from "react-cookie";
 import { Login } from "../entity/login";
 import { Token } from "../entity/token";
 import { Redirect } from 'react-router-dom';
+import { TokenContext } from "../config/clinetProvicer";
 
 const useStyles = makeStyles(theme => ({
   "@global": {
@@ -57,7 +58,7 @@ const LOGIN = gql`
 
 export default function SignIn() {
   const classes = useStyles();
-  const [_, setToken] = useCookies(["token"]);
+  const [token, setToken] = useCookies(["token"]);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [skip, setSkip] = useState(true);
@@ -66,6 +67,17 @@ export default function SignIn() {
     skip: skip
   });
   const [redirect, setRedirect] = useState(false);
+  const refreshToken = useContext(TokenContext)
+
+  useEffect(() => {
+    if(token.refreshToken){
+      refreshToken.refresh().then(value => {
+        if(value){
+          setRedirect(true)
+        }
+      })
+    }
+  })  
 
   function login(e: FormEvent) {
     e.preventDefault();
