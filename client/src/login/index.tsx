@@ -162,7 +162,7 @@ export default function SignIn() {
           horizontal: "left"
         }}
         open={data !== undefined}
-        autoHideDuration={2000}
+        autoHideDuration={800}
         onClose={() => onSuccess(data ? data.login : null)}
         message={<span id="success-id">Login success</span>}
       />
