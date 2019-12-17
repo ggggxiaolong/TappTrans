@@ -11,7 +11,7 @@ WORKDIR /home/Service
 COPY . /home/Service
 
 #使用RUN命令执行npm install安装工程依赖库
-RUN npm set registry https://registry.npm.taobao.org/
+# RUN npm set registry https://registry.npm.taobao.org/
 RUN npm install
 
 #暴露给主机的端口号
