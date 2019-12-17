@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { useStyles } from "./styles";
-import { Transition, allLanguage, languagesMap } from "./config";
+import { allLanguage, languagesMap } from "./config";
 import { Dialog, AppBar, Toolbar, Typography, TextField, List, ListItem, Divider, IconButton, Button, FormGroup, FormControl, LinearProgress, Select, MenuItem, InputLabel } from "@material-ui/core";
 import CloseIcon from '@material-ui/icons/Close';
 import LanguageIcon from '@material-ui/icons/Language';
@@ -9,7 +9,7 @@ export default function UpdateLang(){
     const classes = useStyles();
     const [openDialog, setOpenDialog] = React.useState(false);
     return(
-    <Dialog fullWidth maxWidth="md" scroll="paper" open={openDialog} TransitionComponent={Transition}>
+    <Dialog fullWidth maxWidth="md" scroll="paper" open={openDialog}>
         <AppBar className={classes.appBar}>
           <Toolbar>
             <IconButton edge="start" color="inherit" onClick={() => setOpenDialog(false)} aria-label="close">
@@ -41,7 +41,7 @@ export default function UpdateLang(){
                 <Select
                   labelId="demo-simple-select-label"
                   id="demo-simple-select"
-                  value={param.projectId}
+                  value={1}
                 >
                   <MenuItem value={1}>ToC</MenuItem>
                   <MenuItem value={2}>ToB_Pad</MenuItem>

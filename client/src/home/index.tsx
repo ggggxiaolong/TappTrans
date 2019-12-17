@@ -30,7 +30,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import { Dialog, AppBar, Toolbar, Typography, TextField, List, ListItem, Divider } from "@material-ui/core";
 import LanguageIcon from '@material-ui/icons/Language';
 import { useStyles } from "./styles";
-import { Language, Result, defaultResult, defaultSearchParam, LANGQUERY, firstPageNum, SearchParam, allLanguage, languagesMap, updateLangMap, Transition } from "./config";
+import { Language, Result, defaultResult, defaultSearchParam, LANGQUERY, firstPageNum, SearchParam, allLanguage, languagesMap, updateLangMap } from "./config";
 
 export default function Home() {
   const classes = useStyles();
@@ -178,6 +178,13 @@ export default function Home() {
         <Table stickyHeader aria-label="sticky table" key="table">
           <TableHead key="table_head">
             <TableRow>
+            <TableCell
+                key={`head_status`}
+                align="inherit"
+                style={{ minWidth: 30 }}
+              >
+                Label
+              </TableCell>
               {param.languages.map(lang => (
                 <TableCell
                   key={`head_${lang}`}
@@ -202,6 +209,7 @@ export default function Home() {
               const status = row['status'] as number;
               return (
                 <TableRow hover role="checkbox" tabIndex={-1} key={rowKey}>
+                  <TableCell key={`${rowKey}_label`}>{row['label']}</TableCell>
                   {
                     param.languages.map(column => {
                       const updateKey = updateLangMap.get(column);
@@ -218,7 +226,7 @@ export default function Home() {
                       }
                     })
                   }
-                  <TableCell key={`${rowKey}_status`}>
+                  <TableCell key={`${rowKey}_action`}>
                     <IconButton onClick={() => setOpenDialog(true)}><EditIcon /></IconButton>
                   </TableCell>
                 </TableRow>
@@ -238,56 +246,6 @@ export default function Home() {
               <hr />
             )}
       </div>
-      <Dialog fullWidth maxWidth="md" scroll="paper" open={openDialog} TransitionComponent={Transition}>
-        <AppBar className={classes.appBar}>
-          <Toolbar>
-            <IconButton edge="start" color="inherit" onClick={() => setOpenDialog(false)} aria-label="close">
-              <CloseIcon />
-            </IconButton>
-            <Typography variant="h6" className={classes.title}>
-              Sound
-              </Typography>
-            <Button autoFocus color="inherit" onClick={() => setOpenDialog(false)}>
-              save
-            </Button>
-          </Toolbar>
-        </AppBar>
-        <List className={classes.dialogItem}>
-          {allLanguage.map(l => {
-            return <>
-              <ListItem button>{languagesMap.get(l)}</ListItem>
-              <ListItem>
-                <TextField className={classes.dialogInput} />
-                {l === 'en' && <IconButton><LanguageIcon /></IconButton>}
-              </ListItem>
-              <Divider />
-            </>
-          })}
-          <ListItem>
-            <FormGroup row>
-              <FormControl className={classes.dialogForm}>
-                <InputLabel id="demo-simple-select-label">Project</InputLabel>
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  value={param.projectId}
-                >
-                  <MenuItem value={1}>ToC</MenuItem>
-                  <MenuItem value={2}>ToB_Pad</MenuItem>
-                  <MenuItem value={3}>ToB_Staff</MenuItem>
-                </Select>
-              </FormControl>
-              <FormControl className={classes.dialogForm}>
-                <TextField label="Model name" />
-              </FormControl>
-              <FormControl className={classes.dialogForm}>
-                <TextField label="Label name" />
-              </FormControl>
-            </FormGroup>
-          </ListItem>
-        </List>
-        <LinearProgress />
-      </Dialog>
     </Paper>
   );
 }

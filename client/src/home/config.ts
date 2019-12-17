@@ -1,8 +1,5 @@
 import { Lang } from "../entity/Lang";
 import { ApolloError, gql } from "apollo-boost";
-import React from "react";
-import { TransitionProps } from "@material-ui/core/transitions/transition";
-import { Slide } from "@material-ui/core";
 
 export interface SearchParam {
     projectId: number;
@@ -64,7 +61,7 @@ export const updateLangMap: Map<Language, UpdateLang> = new Map([
 export const LANGQUERY = (param: SearchParam) => gql`
     query language($page: Int, $search: String , $projectId: Int, $pageSize: Int) {
       language(page: $page, search: $search, projectId: $projectId, pageSize: $pageSize) {
-        id ${param.languages.join(" ")} ${param.languages.join(" new_")} status
+        id ${param.languages.join(" ")} ${param.languages.map(l => updateLangMap.get(l)).join(" ")} status label
       }
     }
   `;
@@ -76,9 +73,5 @@ export const QUERY_TRANS = gql`
         }
     }
 `;
-
-export const Transition = React.forwardRef<unknown, TransitionProps>(function Transition(props, ref) {
-    return <Slide direction="up" ref = { ref } {...props} />;
-});
 
 export default {};

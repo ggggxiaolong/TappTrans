@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import { useStyles } from "./styles";
-import { Transition, allLanguage, languagesMap } from "./config";
+import { allLanguage, languagesMap } from "./config";
 import { Dialog, AppBar, Toolbar, Typography, TextField, List, ListItem, Divider, IconButton, Button, FormGroup, FormControl, LinearProgress, Select, MenuItem, InputLabel } from "@material-ui/core";
 import CloseIcon from '@material-ui/icons/Close';
 import LanguageIcon from '@material-ui/icons/Language';
@@ -57,7 +57,7 @@ export default function AddLangDialog(prop: Props) {
   };
 
   return (
-    <Dialog fullWidth maxWidth="md" scroll="paper" open={openDialog} TransitionComponent={Transition}>
+    <Dialog fullWidth maxWidth="md" scroll="paper" open={openDialog} >
       <AppBar className={classes.appBar}>
         <Toolbar>
           <IconButton edge="start" color="inherit" onClick={() => setOpenDialog(false)} aria-label="close">
