@@ -30,7 +30,8 @@ import CloseIcon from '@material-ui/icons/Close';
 import { Dialog, AppBar, Toolbar, Typography, TextField, List, ListItem, Divider } from "@material-ui/core";
 import LanguageIcon from '@material-ui/icons/Language';
 import { useStyles } from "./styles";
-import { Language, Result, defaultResult, defaultSearchParam, LANGQUERY, firstPageNum, SearchParam, allLanguage, languagesMap, updateLangMap } from "./config";
+import { Language, Result, defaultResult, defaultSearchParam, LANGQUERY, firstPageNum, SearchParam, allLanguage, languagesMap, updateLangMap, allProject } from "./config";
+import AddLangDialog from "./addLangDialog";
 
 export default function Home() {
   const classes = useStyles();
@@ -131,9 +132,7 @@ export default function Home() {
             value={param.projectId}
             onChange={handleProject}
           >
-            <MenuItem value={1}>ToC</MenuItem>
-            <MenuItem value={2}>ToB_Pad</MenuItem>
-            <MenuItem value={3}>ToB_Staff</MenuItem>
+            {allProject.map(project => <MenuItem key={`project_menu_${project.id}`} value={project.id} >{project.name}</MenuItem>)}
           </Select>
         </FormControl>
         {allLanguage.map(lang => (
@@ -195,7 +194,7 @@ export default function Home() {
                 </TableCell>
               ))}
               <TableCell
-                key={`head_status`}
+                key={`head_action`}
                 align="inherit"
                 style={{ minWidth: 30 }}
               >
@@ -246,6 +245,7 @@ export default function Home() {
               <hr />
             )}
       </div>
+      <AddLangDialog open={openDialog} projectId={param.projectId} onFail={(message)=>{}} onSuccess={()=>{}} onClose={ () => setOpenDialog(false)}/>
     </Paper>
   );
 }

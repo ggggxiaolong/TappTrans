@@ -15,5 +15,7 @@ export class AddLang {
     constructor() {
         this.project_id = -1;
         this.not_trans = 0;
+        this.mode_name ="app";
+        this.file_name="strings.xml"
     }
 }

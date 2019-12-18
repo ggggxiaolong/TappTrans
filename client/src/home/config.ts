@@ -1,5 +1,6 @@
 import { Lang } from "../entity/Lang";
 import { ApolloError, gql } from "apollo-boost";
+import { Project } from "../entity/Project";
 
 export interface SearchParam {
     projectId: number;
@@ -19,6 +20,8 @@ export interface Result {
 export type Language = "en" | "ja" | "ko" | "sk" | "cs" | "fr" | "es" ;
 export type UpdateLang = "new_en" | "new_ja" | "new_ko" | "new_sk" | "new_cs" | "new_fr" | "new_es";
 export const allLanguage: Array<Language> = ["en", "ja", "ko", "sk", "cs", "fr", "es"];
+
+export const allProject: Array<Project> = [ new Project(1, "ToC"), new Project(2, "ToB_Pad"), new Project(3, "ToB_Staff"), new Project(4, "Web"), ];
 
 export const firstPageNum = 0;
 
@@ -72,6 +75,12 @@ export const QUERY_TRANS = gql`
             en ja ko sk cs fr es
         }
     }
+`;
+
+export const MUTATION_ADD_LANG = gql`
+    mutation add($add: AddLang){
+        addLang(lang: $add){ id }
+    } 
 `;
 
 export default {};
