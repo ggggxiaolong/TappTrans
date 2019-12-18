@@ -15,8 +15,6 @@
       "node-fetch": "^2.6.0",
       "reflect-metadata": "^0.1.10",
       "sqlite3": "^4.0.3",
-      "translate-api": "^0.3.18",
-      "translation.js": "^0.7.12",
       "typeorm": "0.2.15"
    },
    "scripts": {
