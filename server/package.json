@@ -19,7 +19,7 @@
       "reflect-metadata": "^0.1.10",
       "sqlite3": "^4.1.0",
       "translation.js": "^0.7.12",
-      "typeorm": "0.2.18"
+      "typeorm": "0.2.25"
    },
    "scripts": {
       "start": "ts-node src/index.ts",
